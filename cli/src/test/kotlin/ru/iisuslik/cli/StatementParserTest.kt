@@ -131,4 +131,56 @@ class StatementParserTest {
             parser.parse("echo kek lol | cat | head")
         )
     }
+
+    @Test
+    fun quotesInside() {
+        assertEquals(
+            getStatement(Echo(listOf("       \" x   "))),
+            parser.parse("echo '       \" x   '")
+        )
+        assertEquals(
+            getStatement(Echo(listOf("       ' x   "))),
+            parser.parse("echo \"       ' x   \"")
+        )
+    }
+
+    @Test
+    fun hardEcho() {
+        assertEquals(
+            getStatement(Echo(listOf("       \" x", "'asd"))),
+            parser.parse("echo '       \" x' \"'asd\"")
+        )
+    }
+
+    @Test
+    fun superHardEcho() {
+        assertEquals(
+            getStatement(Echo(listOf("       \" x", "wedsf     'cv"))),
+            parser.parse("echo '       \" x' \"wedsf     'cv\"")
+        )
+    }
+
+    @Test
+    fun substitutionDoubleQuotes() {
+        val container = VarsContainer()
+        container.add("kek", "lol")
+        val parser = StatementParser(container)
+        assertEquals("\"lol\"", parser.substitution("\"\$kek\""))
+    }
+
+    @Test
+    fun substitutionQuotesNotHappening() {
+        val container = VarsContainer()
+        container.add("kek", "lol")
+        val parser = StatementParser(container)
+        assertEquals("'\$kek'", parser.substitution("'\$kek'"))
+    }
+
+    @Test
+    fun echoDollar() {
+        assertEquals(
+            getStatement(Echo(listOf("a\$a"))),
+            parser.parse("echo 'a\$a'")
+        )
+    }
 }

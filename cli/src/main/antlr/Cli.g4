@@ -1,8 +1,8 @@
 grammar Cli;
 
 statement returns [ru.iisuslik.cli.Statement value]
-    :   SPLIT? (a=assignment {$value = $a.value;}
-        | c=commands {$value = new ru.iisuslik.cli.Commands($c.list);}) SPLIT?
+    :   SPLIT* (a=assignment {$value = $a.value;}
+        | c=commands {$value = new ru.iisuslik.cli.Commands($c.list);}) SPLIT*
     ;
 
 assignment returns [ru.iisuslik.cli.Assignment value]
@@ -12,24 +12,24 @@ assignment returns [ru.iisuslik.cli.Assignment value]
 commands returns [java.util.List<ru.iisuslik.cli.Command> list]
     :   {$list = new java.util.ArrayList<>();}
         c=command {$list.add($c.value);}
-        (SPLIT '|' SPLIT c=command {$list.add($c.value);})*
+        (SPLIT+ '|' SPLIT+ c=command {$list.add($c.value);})*
     ;
 
 command returns [ru.iisuslik.cli.Command value]
-    :   w=word a=args {$value = ru.iisuslik.cli.Command.build($w.text, $a.list);}
+    :   w=word a=args {$value = ru.iisuslik.cli.StatementParser.build($w.text, $a.list);}
     ;
 
 args returns [java.util.List<String> list]
     :   {$list = new java.util.ArrayList<>();}
-        (SPLIT a=arg {$list.add($a.value);})*
+        (SPLIT+ a=arg {$list.add($a.value);})*
 
     ;
 
 
 arg returns [String value]
     :   w=word {$value = $w.text;}
-        | '"' s=string '"' {$value = $s.text;}
-        | '\'' s=string '\'' {$value = $s.text;}
+        | '"' s2=q2string '"' {$value = $s2.text;}
+        | '\'' s1=q1string '\'' {$value = $s1.text;}
     ;
 
 word
@@ -37,7 +37,19 @@ word
     ;
 
 string
-    : (LETTER | DIGIT | '.' | '-' | ' ' | '!' | '\t' | '|' | '\\' | '(' | ')' | '*' | '[' | ']' | '+' | '^' | '$')+
+    : string_letter+
+    ;
+
+q1string
+    : (string_letter | '"' | '$')+
+    ;
+
+q2string
+    : (string_letter | '\'')+
+    ;
+
+string_letter
+    : LETTER | DIGIT | '.' | '-' | ' ' | '!' | '\t' | '|'
     ;
 
 DIGIT

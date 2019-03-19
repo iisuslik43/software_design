@@ -11,7 +11,7 @@ class FileControllerTest {
 
     @Test
     fun pwdWorks() {
-        assertTrue(pwd().contains("${File.separator}software_design${File.separator}cli".toRegex()))
+        assertTrue(pwd().endsWith("${File.separator}software_design${File.separator}cli"))
     }
 
     @Test
@@ -38,8 +38,8 @@ class FileControllerTest {
     @Test
     fun wcTwoFiles() {
         assertEquals(
-            "${getRealFileName("file3")}: 1 2 9\n${getRealFileName("file1")}: 1 1 8\n" +
-                    "total: 2 3 17",
+            "${getRealFileName("file3")}: 1 2 9${System.lineSeparator()}" +
+                    "${getRealFileName("file1")}: 1 1 8${System.lineSeparator()}total: 2 3 17",
             wcFiles(listOf(getRealFileName("file3"), getRealFileName("file1")))
         )
     }
