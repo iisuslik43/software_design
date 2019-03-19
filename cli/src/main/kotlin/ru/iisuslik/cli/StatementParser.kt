@@ -94,6 +94,7 @@ class StatementParser(val varsContainer: VarsContainer) {
                 "echo" -> Echo(args)
                 "wc" -> Wc(args)
                 "cat" -> Cat(args)
+                "grep" -> Grep(args)
                 // Real bash doesn't care too if we pass any args to pwd or exit
                 "pwd" -> Pwd
                 "exit" -> Exit

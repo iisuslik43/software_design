@@ -1,6 +1,7 @@
 package ru.iisuslik.cli
 
 import com.xenomachina.argparser.ArgParser
+import com.xenomachina.argparser.UnrecognizedOptionException
 import com.xenomachina.argparser.default
 import com.xenomachina.argparser.mainBody
 
@@ -125,27 +126,36 @@ data class Cat(val args: List<String>) : Command {
 
 data class Grep(val args: List<String>) : Command {
     override fun execute(input: String): String {
-        val parsedArgs = GrepArgsParser(ArgParser(args.toTypedArray()))
-        val regex = getRegex(parsedArgs)
-        // ignoring input if args are not empty
-        return if (parsedArgs.files.isEmpty()) {
-            grepInput(input, regex, parsedArgs.linesCount)
-        } else {
-            grepFiles(parsedArgs.files, regex, parsedArgs.linesCount)
+        try {
+            val parsedArgs = GrepArgsParser(ArgParser(args.toTypedArray()))
+            if (parsedArgs.linesCount < 0) {
+                throw ErrorInCommandException("-A argument < 0: ${parsedArgs.linesCount}")
+            }
+            val regex = getRegex(parsedArgs)
+            // ignoring input if args are not empty
+            return if (parsedArgs.files.isEmpty()) {
+                grepInput(input, regex, parsedArgs.linesCount)
+            } else {
+                grepFiles(parsedArgs.files, regex, parsedArgs.linesCount)
+            }
+        } catch (e: UnrecognizedOptionException) {
+            throw ErrorInCommandException(e.message ?: "Wrong option")
+        } catch (e: NumberFormatException) {
+            throw ErrorInCommandException("-A argument is not a number")
         }
     }
 
     class GrepArgsParser(parser: ArgParser) {
         val ignoringCaseSensivity by parser.flagging("-i", help = "Ignoring case sensitivity")
         val searchingWords by parser.flagging("-w", help = "Searching full words")
-        val linesCount by parser.storing("-n", help = "Printing n lines") { toInt() }.default { 0 }
+        val linesCount by parser.storing("-A", help = "Printing n lines") { toInt() }.default { 0 }
         val regex by parser.positional("REGEX", help = "Regex or just a string to find")
-        val files by parser.positionalList("FILE", help = "Source files"). default { emptyList()}
+        val files by parser.positionalList("FILE", help = "Source files").default { emptyList() }
     }
 
     private fun getRegex(parsedArgs: GrepArgsParser): Regex {
         val regexString = if (parsedArgs.searchingWords) {
-            "(\\b|^)${parsedArgs.regex}(\\b|$)"
+            "\\b${parsedArgs.regex}\\b"
         } else {
             parsedArgs.regex
         }

@@ -107,12 +107,12 @@ fun executeCommand(name: String, args: List<String>, input: String): String {
 fun grepInput(input: String, regex: Regex, linesCount: Int): String {
     val stringBuilder = StringBuilder()
     var curCount = 0
-    for (line in input.split('\n')) {
+    for (line in input.split(System.lineSeparator())) {
         if (regex.containsMatchIn(line)) {
-            stringBuilder.append(line + '\n')
+            stringBuilder.append(line + System.lineSeparator())
             curCount = linesCount
         } else if (curCount > 0) {
-            stringBuilder.append(line + '\n')
+            stringBuilder.append(line + System.lineSeparator())
             curCount--
         }
     }
@@ -124,8 +124,7 @@ fun grepFiles(fileNames: List<String>, regex: Regex, linesCount: Int): String {
     for (fileName in fileNames) {
         val file = File(fileName)
         if (!file.exists()) {
-            println("File \"$fileName\" doesn't exists")
-            continue
+            throw ErrorInCommandException("File \"$fileName\" doesn't exists")
         }
         val fileText = file.readText()
         val grepResult = grepInput(fileText, regex, linesCount)

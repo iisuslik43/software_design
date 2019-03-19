@@ -47,7 +47,7 @@ class FileControllerTest {
     @Test
     fun grepFile() {
         assertEquals(
-            "kek find me lol\n",
+            "kek find me lol${System.lineSeparator()}",
             grepFiles(listOf(getRealFileName("file4")), "find me".toRegex(), 0)
         )
     }
@@ -55,7 +55,7 @@ class FileControllerTest {
     @Test
     fun grepFileIgnoringCase() {
         assertEquals(
-            "kek find me lol\n",
+            "kek find me lol${System.lineSeparator()}",
             grepFiles(listOf(getRealFileName("file4")), "FIND ME".toRegex(RegexOption.IGNORE_CASE), 0)
         )
     }
@@ -63,7 +63,7 @@ class FileControllerTest {
     @Test
     fun grepTwoFiles() {
         assertEquals(
-            "content1\ncontent2\n",
+            "content1${System.lineSeparator()}content2${System.lineSeparator()}",
             grepFiles(
                 listOf(getRealFileName("file1"), getRealFileName("file2")),
                 "content".toRegex(), 0
@@ -74,7 +74,8 @@ class FileControllerTest {
     @Test
     fun grepTwoLines() {
         assertEquals(
-            "kek find me lol\nlollollol\n",
+            "kek find me lol${System.lineSeparator()}" +
+                    "lollollol${System.lineSeparator()}",
             grepFiles(
                 listOf( getRealFileName("file4")),
                 "(lol)+".toRegex(), 0
@@ -85,7 +86,9 @@ class FileControllerTest {
     @Test
     fun grepAdditionalLines() {
         assertEquals(
-            "kek find me lol\nkeeeeek\nlollollol\n",
+            "kek find me lol${System.lineSeparator()}" +
+                    "keeeeek${System.lineSeparator()}" +
+                    "lollollol${System.lineSeparator()}",
             grepFiles(listOf(getRealFileName("file4")), "find me".toRegex(), 2)
         )
     }
@@ -93,14 +96,14 @@ class FileControllerTest {
     @Test
     fun grepWord() {
         assertEquals(
-            "kek find me lol\n",
+            "kek find me lol${System.lineSeparator()}",
             grepFiles(listOf(getRealFileName("file4")), "(\\b|^)find(\\b|$)".toRegex(), 0)
         )
     }
     @Test
     fun grepWordOneOnLine() {
         assertEquals(
-            "1\n",
+            "1${System.lineSeparator()}",
             grepFiles(listOf(getRealFileName("file4")), "(\\b|^)1(\\b|$)".toRegex(), 0)
         )
     }

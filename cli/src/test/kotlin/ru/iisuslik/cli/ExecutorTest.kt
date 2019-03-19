@@ -151,8 +151,37 @@ class ExecutorTest {
         assertEquals(
             "kek find me lol\nkeeeeek\n", executor.runCommands(
                 listOf(
-                    Grep(listOf("-w", "-n", "1", "find", getRealFileName("file4")))
+                    Grep(listOf("-w", "-A", "1", "find", getRealFileName("file4")))
                 )
+            )
+        )
+    }
+
+    @Test(expected = ErrorInCommandException::class)
+    fun grepWrongA() {
+        executor.runCommands(
+            listOf(
+                Grep(listOf("-A", "-10", "find", getRealFileName("file4")))
+            )
+        )
+
+    }
+
+    @Test(expected = ErrorInCommandException::class)
+    fun grepWrongKey() {
+        executor.runCommands(
+            listOf(
+                Grep(listOf("-q", "find", getRealFileName("file4")))
+            )
+        )
+
+    }
+
+    @Test(expected = ErrorInCommandException::class)
+    fun grepWrongEmptyA() {
+        executor.runCommands(
+            listOf(
+                Grep(listOf("-A", "find", getRealFileName("file4")))
             )
         )
     }
