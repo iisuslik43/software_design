@@ -94,7 +94,7 @@ class ExecutorTest {
     @Test
     fun grepSimple() {
         assertEquals(
-            "2\n",
+            "2${System.lineSeparator()}",
             executor.runCommands(listOf(Grep(listOf("2", getRealFileName("file4")))))
         )
     }
@@ -102,7 +102,7 @@ class ExecutorTest {
     @Test
     fun grepInput() {
         assertEquals(
-            "1\n", executor.runCommands(
+            "1${System.lineSeparator()}", executor.runCommands(
                 listOf(
                     Echo(listOf("1")),
                     Grep(listOf("1"))
@@ -114,7 +114,7 @@ class ExecutorTest {
     @Test
     fun grepInputIgnore() {
         assertEquals(
-            "2\n", executor.runCommands(
+            "2${System.lineSeparator()}", executor.runCommands(
                 listOf(
                     Echo(listOf("1")),
                     Grep(listOf("2", getRealFileName("file4")))
@@ -126,7 +126,7 @@ class ExecutorTest {
     @Test
     fun grepIgnoreCase() {
         assertEquals(
-            "A\n", executor.runCommands(
+            "A${System.lineSeparator()}", executor.runCommands(
                 listOf(
                     Echo(listOf("A")),
                     Grep(listOf("-i", "a"))
@@ -138,7 +138,7 @@ class ExecutorTest {
     @Test
     fun grepFindWord() {
         assertEquals(
-            "kek find me lol\n", executor.runCommands(
+            "kek find me lol${System.lineSeparator()}", executor.runCommands(
                 listOf(
                     Grep(listOf("-w", "find", getRealFileName("file4")))
                 )
@@ -149,7 +149,7 @@ class ExecutorTest {
     @Test
     fun grepMoreLines() {
         assertEquals(
-            "kek find me lol\nkeeeeek\n", executor.runCommands(
+            "kek find me lol${System.lineSeparator()}keeeeek${System.lineSeparator()}", executor.runCommands(
                 listOf(
                     Grep(listOf("-w", "-A", "1", "find", getRealFileName("file4")))
                 )
